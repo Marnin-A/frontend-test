@@ -1,5 +1,21 @@
 ## Frontend Technical Assessment - Document Signer & Annotation Tool
 
+## Getting Started
+
+First, run the development server:
+
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
+
+Open [http://localhost:4000](http://localhost:4000) with your browser to see the result.
+
 ## Overview
 
 This technical assessment is designed to evaluate your skills in building interactive, modern web applications using Next.js. You'll be creating a single-page document signer and annotation tool that allows users to work with PDF documents.
@@ -9,11 +25,13 @@ This technical assessment is designed to evaluate your skills in building intera
 ### Core Functionality
 
 1. **Document Upload**
+
    - Users should be able to upload PDF documents
    - Implement drag-and-drop functionality and/or file selection dialog
    - Display uploaded document in the viewport
 
 2. **Annotation Features**
+
    - Implement the following annotation capabilities:
      - Highlight text with customizable colors
      - Underline text with customizable colors
@@ -60,14 +78,7 @@ Your submission will be evaluated based on:
    - Any features you would add if you had more time
 4. Submit a pull request or send us a link to your repository
 
-## Time Allocation
+## Time Used
 
 You have three days to complete this assessment. We estimate it should take approximately 8-10 hours of focused work.
-
-## Questions
-
-If you have any questions or need clarification, please reach out to [dev.ritease@gmail.com](mailto:dev.ritease@gmail.com).
-
-Good luck!
-
-
+Start Time: 7am Thursday March 26th, 2025.
