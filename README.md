@@ -26,36 +26,36 @@ This technical assessment is designed to evaluate your skills in building intera
 
 1. **Document Upload**
 
-   [] Users should be able to upload PDF documents
-   [] Implement drag-and-drop functionality and/or file selection dialog
-   [] Display uploaded document in the viewport
+   -[] Users should be able to upload PDF documents
+   -[] Implement drag-and-drop functionality and/or file selection dialog
+   -[] Display uploaded document in the viewport
 
 2. **Annotation Features**
 
    - Implement the following annotation capabilities:
-     [] Highlight text with customizable colors
-     [] Underline text with customizable colors
-     [] Add comments attached to specific parts of the document
-     [] Draw signatures anywhere on the document
+     -[] Highlight text with customizable colors
+     -[] Underline text with customizable colors
+     -[] Add comments attached to specific parts of the document
+     -[] Draw signatures anywhere on the document
 
 3. **Document Export**
-   [] Allow users to export the annotated document as a PDF
-   [] All annotations and signatures must be properly embedded in the exported PDF
-   [] Exported document should maintain the quality of the original
+   -[] Allow users to export the annotated document as a PDF
+   -[] All annotations and signatures must be properly embedded in the exported PDF
+   -[] Exported document should maintain the quality of the original
 
 ### Technical Requirements
 
-[-] Use **Next.js** as your framework
-[] Implement a single-page application (SPA) design where all actions occur without page reloads
-[] Create a responsive design that works well on different screen sizes
-[] Ensure the application has a clean, intuitive, and professional UI/UX
+-[-] Use **Next.js** as your framework
+-[] Implement a single-page application (SPA) design where all actions occur without page reloads
+-[] Create a responsive design that works well on different screen sizes
+-[] Ensure the application has a clean, intuitive, and professional UI/UX
 
 ### UI/UX Requirements
 
-[] Design a sleek, modern interface with clear visual hierarchy
-[] Implement intuitive controls for all annotation tools
-[] Create smooth transitions between different states of the application
-[] Provide appropriate feedback for user actions (loading states, success/error messages)
+-[] Design a sleek, modern interface with clear visual hierarchy
+-[] Implement intuitive controls for all annotation tools
+-[] Create smooth transitions between different states of the application
+-[] Provide appropriate feedback for user actions (loading states, success/error messages)
 
 ## Evaluation Criteria
 
