@@ -4,7 +4,7 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { aspekta } from "@/app/layout";
 
-interface ButtonStore {
+interface CanvasStore {
 	// State
 	theme: boolean;
 	numPages: number | null;
@@ -52,7 +52,7 @@ interface ButtonStore {
 	exportPdf: () => void;
 }
 
-export const useButtons = create<ButtonStore>((set, get) => ({
+export const useCanvas = create<CanvasStore>((set, get) => ({
 	// State
 	theme: false,
 	numPages: null,
@@ -145,7 +145,7 @@ export const useButtons = create<ButtonStore>((set, get) => ({
 				canvi.add(img);
 				canvi.renderAll();
 				// Optionally get the data URL
-				const dataURL = canvi.toDataURL({
+				canvi.toDataURL({
 					format: "png",
 					quality: 0.8,
 					multiplier: 1,
@@ -165,7 +165,7 @@ export const useButtons = create<ButtonStore>((set, get) => ({
 				img.scaleToWidth(100);
 				canvi.add(img);
 				canvi.renderAll();
-				const dataURL = canvi.toDataURL({
+				canvi.toDataURL({
 					format: "png",
 					quality: 0.8,
 					multiplier: 1,

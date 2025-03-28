@@ -26,9 +26,9 @@ This technical assessment is designed to evaluate your skills in building intera
 
 1. **Document Upload**
 
-   - [ ] Users should be able to upload PDF documents
-   - [ ] Implement drag-and-drop functionality and/or file selection dialog
-   - [ ] Display uploaded document in the viewport
+   - [x] Users should be able to upload PDF documents
+   - [x] Implement drag-and-drop functionality and/or file selection dialog
+   - [x] Display uploaded document in the viewport
 
 2. **Annotation Features**
 
