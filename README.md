@@ -46,9 +46,9 @@ This technical assessment is designed to evaluate your skills in building intera
 ### Technical Requirements
 
 - [x] Use **Next.js** as your framework
-- [ ] Implement a single-page application (SPA) design where all actions occur without page reloads
-- [ ] Create a responsive design that works well on different screen sizes
-- [ ] Ensure the application has a clean, intuitive, and professional UI/UX
+- [x] Implement a single-page application (SPA) design where all actions occur without page reloads
+- [x] Create a responsive design that works well on different screen sizes
+- [x] Ensure the application has a clean, intuitive, and professional UI/UX
 
 ### UI/UX Requirements
 

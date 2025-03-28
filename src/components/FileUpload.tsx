@@ -13,6 +13,7 @@ import "react-pdf/dist/esm/Page/AnnotationLayer.css";
 import "react-pdf/dist/esm/Page/TextLayer.css";
 import { toast } from "sonner";
 import { Button } from "./ui/button";
+import SideBar from "./SideBar";
 
 export default function FileUpload() {
 	const canvasValue = useCanvas();
@@ -80,6 +81,7 @@ export default function FileUpload() {
 	}, []);
 	return (
 		<div className="min-h-screen bg-slate-200">
+			{canvasValue.selectedFile && <SideBar />}
 			{canvasValue.selectedFile ? (
 				<div
 					className={`w-full py-8 ${

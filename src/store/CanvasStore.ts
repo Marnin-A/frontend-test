@@ -10,6 +10,8 @@ interface CanvasStore {
 	numPages: number | null;
 	currPage: number;
 	selectedFile: File | null;
+	undoStack: fabric.Object[];
+	redoStack: fabric.Object[];
 	color: string;
 	borderColor: string;
 	strokeWidth: number;
@@ -38,17 +40,14 @@ interface CanvasStore {
 
 	// Other methods
 	downloadPage: () => Promise<void>;
-	addImage: (
-		e: React.ChangeEvent<HTMLInputElement>,
-		canvi: fabric.Canvas
-	) => void;
-	addNote: (canvi: fabric.Canvas) => void;
+	addNote: (canvasObj: fabric.Canvas) => void;
 	deleteBtn: () => void;
-	addRect: (canvi: fabric.Canvas) => void;
-	addCircle: (canvi: fabric.Canvas) => void;
-	addHighlight: (canvi: fabric.Canvas) => void;
-	addText: (canvi: fabric.Canvas) => void;
-	toggleDraw: (canvi: fabric.Canvas) => void;
+	addHighlight: (canvasObj: fabric.Canvas) => void;
+	drawUnderline: (canvasObj: fabric.Canvas) => void;
+	undoAction: () => void;
+	redoAction: () => void;
+	addText: (canvasObj: fabric.Canvas) => void;
+	toggleDraw: (canvasObj: fabric.Canvas) => void;
 	exportPdf: () => void;
 }
 
@@ -58,6 +57,8 @@ export const useCanvas = create<CanvasStore>((set, get) => ({
 	numPages: null,
 	currPage: 1,
 	selectedFile: null,
+	undoStack: [],
+	redoStack: [],
 	color: "#000",
 	borderColor: "#f4a261",
 	strokeWidth: 1,
@@ -80,7 +81,7 @@ export const useCanvas = create<CanvasStore>((set, get) => ({
 	setHiddenCanvas: (value: boolean) => set({ hideCanvas: value }),
 	setExportPages: (pages: HTMLElement[]) => set({ exportPages: pages }),
 
-	// When changing color, update active fabric object (if exists)
+	// Update drawing properties and active object
 	setColor: (newColor: string) => {
 		set({ color: newColor });
 		const { canvas } = get();
@@ -91,7 +92,6 @@ export const useCanvas = create<CanvasStore>((set, get) => ({
 		}
 	},
 
-	// When changing borderColor, update drawing brush and active object
 	setBorderColor: (newColor: string) => {
 		set({ borderColor: newColor });
 		const { canvas } = get();
@@ -105,7 +105,6 @@ export const useCanvas = create<CanvasStore>((set, get) => ({
 		}
 	},
 
-	// Update strokeWidth for both drawing mode and active object
 	setStrokeWidth: (newWidth: number) => {
 		set({ strokeWidth: newWidth });
 		const { canvas } = get();
@@ -134,111 +133,142 @@ export const useCanvas = create<CanvasStore>((set, get) => ({
 		set({ isExporting: false });
 	},
 
-	addImage: (e: React.ChangeEvent<HTMLInputElement>, canvi: fabric.Canvas) => {
-		const file = e.target.files && e.target.files[0];
-		if (!file) return;
-		const reader = new FileReader();
-		reader.onload = function (f: ProgressEvent<FileReader>) {
-			const data = f.target?.result as string;
-			fabric.FabricImage.fromURL(data, {}, function (img: fabric.Image) {
-				img.scaleToWidth(300);
-				canvi.add(img);
-				canvi.renderAll();
-				// Optionally get the data URL
-				canvi.toDataURL({
-					format: "png",
-					quality: 0.8,
-					multiplier: 1,
-				});
-			});
-		};
-		reader.readAsDataURL(file);
-		canvi.isDrawingMode = false;
-	},
-
-	addNote: (canvi: fabric.Canvas) => {
+	addNote: (canvasObj: fabric.Canvas) => {
 		const noteNumber = (Math.floor(Math.random() * 10) % 4) + 1;
 		fabric.FabricImage.fromURL(
 			`./note/note${noteNumber}.png`,
 			{},
 			function (img: fabric.Image) {
 				img.scaleToWidth(100);
-				canvi.add(img);
-				canvi.renderAll();
-				canvi.toDataURL({
+				canvasObj.add(img);
+				// Push the added note to the undo stack
+				set((state) => ({ undoStack: [...state.undoStack, img] }));
+				canvasObj.renderAll();
+				canvasObj.toDataURL({
 					format: "png",
 					quality: 0.8,
 					multiplier: 1,
 				});
 			}
 		);
-		canvi.isDrawingMode = false;
+		canvasObj.isDrawingMode = false;
 	},
 
 	deleteBtn: () => {
 		const { canvas } = get();
 		if (canvas && canvas.getActiveObject()) {
+			// Optionally, you can save the deleted object if you wish to support redo
 			canvas.remove(canvas.getActiveObject()!);
+			canvas.renderAll();
 		}
 	},
 
-	addRect: (canvi: fabric.Canvas) => {
-		const { color, borderColor, strokeWidth } = get();
-		const rect = new fabric.Rect({
-			height: 180,
-			width: 200,
-			fill: color,
-			stroke: borderColor,
-			strokeWidth: strokeWidth,
-			cornerStyle: "circle",
-			editable: true,
+	addHighlight: (canvasObj: fabric.Canvas) => {
+		// Enable drawing mode
+		canvasObj.isDrawingMode = true;
+
+		// Create a new PencilBrush for highlighting
+		const highlight = new fabric.PencilBrush(canvasObj);
+		highlight.width = 10;
+		highlight.color = "rgba(244, 162, 97, 0.5)"; // Semi-transparent for highlight effect
+		highlight.strokeLineCap = "round";
+		highlight.strokeLineJoin = "round";
+
+		// Assign the brush to the canvas
+		canvasObj.freeDrawingBrush = highlight;
+
+		// When a new path is created, add it to the undo stack
+		canvasObj.on("path:created", (event) => {
+			if (event.path) {
+				set((state) => ({ undoStack: [...state.undoStack, event.path] }));
+			}
 		});
-		canvi.add(rect);
-		canvi.renderAll();
-		canvi.isDrawingMode = false;
+
+		canvasObj.renderAll();
 	},
 
-	addCircle: (canvi: fabric.Canvas) => {
+	drawUnderline: (canvasObj: fabric.Canvas) => {
+		const { color, strokeWidth } = get();
+		let isDrawing = false;
+		let underline: fabric.Line;
+
+		// When the user presses the mouse button down, begin drawing
+		const handleMouseDown = (
+			opt: fabric.TPointerEventInfo<fabric.TPointerEvent>
+		) => {
+			isDrawing = true;
+			const pointer = canvasObj.getViewportPoint(opt.e);
+			// Create a line with the start and end at the pointer position
+			underline = new fabric.Line(
+				[pointer.x, pointer.y, pointer.x, pointer.y],
+				{
+					stroke: color,
+					strokeWidth: strokeWidth,
+					selectable: false,
+					evented: false,
+				}
+			);
+			canvasObj.add(underline);
+		};
+
+		// As the mouse moves, update the end coordinates of the line
+		const handleMouseMove = (
+			opt: fabric.TPointerEventInfo<fabric.TPointerEvent>
+		) => {
+			if (!isDrawing) return;
+			const pointer = canvasObj.getViewportPoint(opt.e);
+			// Update the x2 coordinate so the line extends horizontally.
+			// Optionally, you could lock the y coordinate if you want a strict underline effect.
+			underline.set({ x2: pointer.x, y2: pointer.y });
+			canvasObj.renderAll();
+		};
+
+		// When the user releases the mouse, finish the drawing
+		const handleMouseUp = () => {
+			if (isDrawing) {
+				isDrawing = false;
+				// Save the underline to the undo stack
+				set((state) => ({ undoStack: [...state.undoStack, underline] }));
+				// Remove event listeners after drawing is finished
+				canvasObj.off("mouse:down", handleMouseDown);
+				canvasObj.off("mouse:move", handleMouseMove);
+				canvasObj.off("mouse:up", handleMouseUp);
+			}
+		};
+
+		// Attach the events
+		canvasObj.on("mouse:down", handleMouseDown);
+		canvasObj.on("mouse:move", handleMouseMove);
+		canvasObj.on("mouse:up", handleMouseUp);
+	},
+
+	addText: (canvasObj: fabric.Canvas) => {
 		const { color, borderColor } = get();
-		const circle = new fabric.Circle({
-			radius: 100,
+		const text = new fabric.Textbox("Add a comment", { editable: true });
+		text.set({
 			fill: color,
-			cornerStyle: "circle",
-			editable: true,
-			stroke: borderColor,
-			strokeWidth: 2,
+			borderTopWidth: 2,
+			borderLeftWidth: 2,
+			borderRightWidth: 2,
+			borderBottomWidth: 2,
+			borderTopLeftRadius: 16,
+			borderTopRightRadius: 16,
+			borderBottomleftRadius: 16,
+			borderBottomRightRadius: 16,
+			borderColor: borderColor,
+			fontSize: 20,
+			fontFamily: aspekta.style.fontFamily,
 		});
-		canvi.add(circle);
-		canvi.renderAll();
-		canvi.isDrawingMode = false;
+		canvasObj.add(text);
+		// Save text addition to the undo stack
+		set((state) => ({ undoStack: [...state.undoStack, text] }));
+		canvasObj.renderAll();
+		canvasObj.isDrawingMode = false;
 	},
 
-	addHighlight: (canvi: fabric.Canvas) => {
-		const { color } = get();
-		const highlight = new fabric.Rect({
-			height: 20,
-			width: 400,
-			fill: color + "33",
-			cornerStyle: "circle",
-			editable: true,
-		});
-		canvi.add(highlight);
-		canvi.renderAll();
-		canvi.isDrawingMode = false;
-	},
-
-	addText: (canvi: fabric.Canvas) => {
-		const { color } = get();
-		const text = new fabric.Textbox("Type Here ...", { editable: true });
-		text.set({ fill: color, fontFamily: aspekta.style.fontFamily });
-		canvi.add(text);
-		canvi.renderAll();
-		canvi.isDrawingMode = false;
-	},
-
-	toggleDraw: (canvi: fabric.Canvas) => {
+	toggleDraw: (canvasObj: fabric.Canvas) => {
 		const { borderColor, strokeWidth, canvas } = get();
-		canvi.isDrawingMode = !canvi.isDrawingMode;
+		canvasObj.isDrawingMode = !canvasObj.isDrawingMode;
 		if (canvas && canvas.freeDrawingBrush) {
 			const brush = canvas.freeDrawingBrush;
 			brush.color = borderColor;
@@ -255,5 +285,31 @@ export const useCanvas = create<CanvasStore>((set, get) => ({
 			),
 		});
 		console.log([...exportPages, exportPage]);
+	},
+
+	// General undo function that removes the last added object from the canvas
+	undoAction: () => {
+		const { canvas, undoStack } = get();
+		if (canvas && undoStack.length > 0) {
+			const lastObj = undoStack[undoStack.length - 1];
+			canvas.remove(lastObj);
+			set({
+				undoStack: undoStack.slice(0, -1),
+				redoStack: [...get().redoStack, lastObj],
+			});
+			canvas.renderAll();
+		}
+	},
+	redoAction: () => {
+		const { canvas, undoStack, redoStack } = get();
+		if (canvas && redoStack.length > 0) {
+			const lastObj = redoStack[redoStack.length - 1];
+			canvas.add(lastObj);
+			set({
+				undoStack: [...undoStack, lastObj],
+				redoStack: redoStack.slice(0, -1),
+			});
+			canvas.renderAll();
+		}
 	},
 }));
