@@ -6,11 +6,13 @@ import { Document, Page, pdfjs } from "react-pdf";
 import { ClimbingBoxLoader } from "react-spinners";
 import { useDropzone } from "react-dropzone";
 import Image from "next/image";
-import { X } from "lucide-react";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import "react-pdf/dist/esm/Page/AnnotationLayer.css";
 import "react-pdf/dist/esm/Page/TextLayer.css";
 import "react-pdf/dist/esm/Page/AnnotationLayer.css";
 import "react-pdf/dist/esm/Page/TextLayer.css";
+import { toast } from "sonner";
+import { Button } from "./ui/button";
 
 export default function FileUpload() {
 	const canvasValue = useCanvas();
@@ -21,6 +23,21 @@ export default function FileUpload() {
 			setDocIsLoading(true);
 			canvasValue.setFile(files[0]);
 		},
+		accept: {
+			"application/pdf": [".pdf"],
+		},
+		multiple: false,
+		maxFiles: 1,
+		onError: (e) => {
+			console.log(e);
+			setDocIsLoading(false);
+		},
+		onDropRejected: (e) => {
+			console.log(e);
+			setDocIsLoading(false);
+			toast.error("Please upload a valid PDF file.");
+		},
+		maxSize: 10000000, // Maximum file size = 10MB
 	});
 
 	function onDocumentLoadSuccess({ numPages }: { numPages: number }) {
@@ -104,7 +121,7 @@ export default function FileUpload() {
 							<Document
 								file={canvasValue.selectedFile}
 								onLoadSuccess={onDocumentLoadSuccess}
-								className="flex justify-center"
+								className="flex justify-center h-[93dvh]"
 								// id="doc"
 							>
 								<div
@@ -133,23 +150,23 @@ export default function FileUpload() {
 					</div>
 					<div className="fixed bottom-2 flex items-center justify-center w-full gap-3 z-50">
 						{canvasValue.currPage > 1 && (
-							<button
+							<Button
 								onClick={() => changePage(-1)}
 								className="px-4 py-2 bg-gray-700 rounded-md text-white"
 							>
-								{"<"}
-							</button>
+								<ChevronLeft />
+							</Button>
 						)}
 						<div className="px-4 py-2 bg-gray-700 rounded-md text-white">
 							Page {canvasValue.currPage} of {canvasValue.numPages}
 						</div>
 						{canvasValue.currPage < canvasValue.numPages! && (
-							<button
+							<Button
 								onClick={() => changePage(1)}
 								className="px-4 py-2 bg-gray-700 rounded-md text-white"
 							>
-								{">"}
-							</button>
+								<ChevronRight />
+							</Button>
 						)}
 					</div>
 				</div>
@@ -158,31 +175,34 @@ export default function FileUpload() {
 					className="w-full min-h-[100vh] py-8 flex items-center justify-center"
 					{...getRootProps()}
 				>
-					<div className="flex w-[40vw] h-[40vh] justify-center items-center rounded-md border-2 border-dashed border-gray-300 px-6 pt-5 pb-6">
-						<div className="space-y-1 text-center">
+					<div className="flex w-[40vw] h-[40vh] justify-center items-center rounded-md border-2 border-dashed border-black px-6 pt-5 pb-6">
+						<div className="space-y-2 text-center w-max">
 							<Image
 								src="/Ritease-logo.jpeg"
 								alt="Logo"
 								width={200}
 								height={80}
+								className="rounded-xl mx-auto"
 							/>
 							<div
-								className={`flex text-md ${
+								className={`flex flex-col items-center text-md ${
 									canvasValue.theme ? "text-gray-400" : "text-gray-600"
 								}`}
 							>
-								<label className="relative cursor-pointer rounded-md bg-transparent font-medium text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:text-indigo-500">
-									<span>Upload a file</span>
-								</label>
+								<div className="flex">
+									<label className="relative cursor-pointer rounded-md bg-transparent font-medium text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-500 focus-within:ring-offset-2 hover:text-indigo-500">
+										<span>Upload a file</span>
+									</label>
+									<p className="pl-1">or drag and drop PDF</p>
+								</div>
 								<input
 									type="file"
 									className="sr-only"
 									accept="application/pdf"
 									{...getInputProps()}
 								/>
-								<p className="pl-1">or drag and drop</p>
+								<p className="pl-1 text-xs text-black">(Max file size: 10MB)</p>
 							</div>
-							<p className="text-sm">PDF</p>
 						</div>
 					</div>
 				</div>
