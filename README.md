@@ -33,15 +33,15 @@ This technical assessment is designed to evaluate your skills in building intera
 2. **Annotation Features**
 
    - Implement the following annotation capabilities:
-     - [ ] Highlight text with customizable colors
-     - [ ] Underline text with customizable colors
-     - [ ] Add comments attached to specific parts of the document
-     - [ ] Draw signatures anywhere on the document
+     - [x] Highlight text with customizable colors
+     - [x] Underline text with customizable colors
+     - [x] Add comments attached to specific parts of the document
+     - [x] Draw signatures anywhere on the document
 
 3. **Document Export**
-   - [ ] Allow users to export the annotated document as a PDF
-   - [ ] All annotations and signatures must be properly embedded in the exported PDF
-   - [ ] Exported document should maintain the quality of the original
+   - [x] Allow users to export the annotated document as a PDF
+   - [x] All annotations and signatures must be properly embedded in the exported PDF
+   - [x] Exported document should maintain the quality of the original
 
 ### Technical Requirements
 
@@ -52,10 +52,10 @@ This technical assessment is designed to evaluate your skills in building intera
 
 ### UI/UX Requirements
 
-- [ ] Design a sleek, modern interface with clear visual hierarchy
-- [ ] Implement intuitive controls for all annotation tools
-- [ ] Create smooth transitions between different states of the application
-- [ ] Provide appropriate feedback for user actions (loading states, success/error messages)
+- [x] Design a sleek, modern interface with clear visual hierarchy
+- [x] Implement intuitive controls for all annotation tools
+- [x] Create smooth transitions between different states of the application
+- [x] Provide appropriate feedback for user actions (loading states, success/error messages)
 
 ## Evaluation Criteria
 
