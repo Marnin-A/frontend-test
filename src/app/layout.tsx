@@ -1,9 +1,8 @@
-import type { Metadata } from "next";
+// import type { Metadata } from "next";
 import "./globals.css";
-
 import localFont from "next/font/local";
 
-export const aspekta = localFont({
+const aspekta = localFont({
 	src: [
 		{
 			path: "./fonts/Aspekta/Aspekta-100.ttf",
