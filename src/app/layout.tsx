@@ -1,6 +1,7 @@
 // import type { Metadata } from "next";
 import "./globals.css";
 import localFont from "next/font/local";
+import { Analytics } from "@vercel/analytics/react";
 
 const aspekta = localFont({
 	src: [
@@ -67,6 +68,7 @@ export default function RootLayout({
 		<html lang="en">
 			<body className={`${aspekta.variable} ${aspekta.variable} antialiased`}>
 				{children}
+				<Analytics />
 			</body>
 		</html>
 	);
