@@ -57,15 +57,24 @@ This technical assessment is designed to evaluate your skills in building intera
 - [x] Create smooth transitions between different states of the application
 - [x] Provide appropriate feedback for user actions (loading states, success/error messages)
 
-## Evaluation Criteria
+## Important Libraries and tools
 
-Your submission will be evaluated based on:
+- React-pdf (for pdf rendering)
+- Shadcn (minimally styled UI components )
+- Zustand (State management)
+- fabric (javascript canvas)
 
-1. **Functionality** - Does the application meet all the requirements?
-2. **Code Quality** - Is your code well-structured, readable, and maintainable?
-3. **UI/UX Design** - Is the interface intuitive, responsive, and visually appealing?
-4. **Performance** - Does the application handle operations efficiently?
-5. **Best Practices** - Do you follow modern web development best practices?
+## Challenges
+
+- Dependency compatibility issues:`React-pdf` versions and extra configuration for NextJS.
+- Package inconsistency: using the newest version of `jsPDF` I ran into inconsistent outputs with lead to
+  sub-optimal results.
+
+## Features I would Add
+
+- Text Editing
+- Improved text formatting
+- Faster Save time
 
 ## Submission Guidelines
 
@@ -81,4 +90,3 @@ Your submission will be evaluated based on:
 ## Time Used
 
 You have three days to complete this assessment. We estimate it should take approximately 8-10 hours of focused work.
-Start Time: 7am Thursday March 26th, 2025.
