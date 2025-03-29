@@ -3,7 +3,7 @@ import { useCanvas } from "@/store/CanvasStore";
 import React from "react";
 import * as fabric from "fabric";
 import { Document, Page, pdfjs } from "react-pdf";
-import { ClimbingBoxLoader } from "react-spinners";
+import { SyncLoader } from "react-spinners";
 import { useDropzone } from "react-dropzone";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
@@ -23,6 +23,7 @@ export default function FileUpload() {
 		onDrop: (files) => {
 			setDocIsLoading(true);
 			canvasValue.setFile(files[0]);
+			canvasValue.setFileName(files[0].name);
 		},
 		accept: {
 			"application/pdf": [".pdf"],
@@ -79,6 +80,7 @@ export default function FileUpload() {
 			import.meta.url
 		).toString();
 	}, []);
+
 	return (
 		<div className="min-h-screen bg-slate-200">
 			{canvasValue.selectedFile && <SideBar />}
@@ -116,7 +118,7 @@ export default function FileUpload() {
 								<>
 									<div className="w-[100%] h-[100%] top-[0] fixed bg-[rgba(50,50,50,0.2)] z-[1001] backdrop-blur-sm"></div>
 									<div className="fixed z-[1100] flex w-[100%] h-[100%] top-[0] justify-center items-center">
-										<ClimbingBoxLoader color={"#606060"} size={20} />
+										<SyncLoader color={"#008081"} size={20} />
 									</div>
 								</>
 							)}
@@ -124,7 +126,6 @@ export default function FileUpload() {
 								file={canvasValue.selectedFile}
 								onLoadSuccess={onDocumentLoadSuccess}
 								className="flex justify-center h-[93dvh]"
-								// id="doc"
 							>
 								<div
 									className="absolute z-[9] px-4 py-4"
